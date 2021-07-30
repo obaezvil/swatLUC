@@ -4,7 +4,7 @@
 #' @param dem Digital elevation model to be used to extract the elevation of the stations.
 #' @param output Folder to write the station files (data and metadata).
 #' @param hru.shape Spatial object of type 'SpatVector' that contains the HRUs as obtained from QSWAT+
-#' @param start Character object that contains the starting date of the model in the format '%Y%m%d' e.g., '19810101'.
+#' @param start Character object that contains the starting date of the model in the format '%Y%m%d' (e.g., '19810101').
 #'
 #' @return
 #' @export
@@ -32,10 +32,13 @@ prec2stations <- function(product, dem, output, hru.shape, start){
 
   # Defining which points don't have elevation
   tmp  <- which(is.nan(elev))
-  elev <- elev[-tmp]
-
+  
   # Neglecting those points in the 'product.points'
-  product.points <- product.points[-tmp,]
+  if(length(tmp) > 0){
+    elev <- elev[-tmp]
+    product.points <- product.points[-tmp,]
+  }
+
 
   # Setting the latitude and longitude based on the virtual stations
   lat   <- terra::geom(product.points)[,4]
@@ -113,10 +116,12 @@ temp2stations <- function(tmax, tmin, dem, output, hru.shape, start){
 
   # Defining which points don't have elevation
   tmp  <- which(is.nan(elev))
-  elev <- elev[-tmp]
-
+  
   # Neglecting those points in the 'product.points'
-  product.points <- product.points[-tmp,]
+  if(length(tmp) > 0){
+    elev <- elev[-tmp]
+    product.points <- product.points[-tmp,]
+  }
 
   # Setting the latitude and longitude based on the virtual stations
   lat   <- terra::geom(product.points)[,4]
