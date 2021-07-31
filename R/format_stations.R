@@ -1,12 +1,12 @@
 #' Format ground-based precipitation data according to `SWAT+` requirements
 #'
-#' @param data zoo object with the precipitation time series of all stations (one per column). The dates should have the format %Y-%m-%d.
+#' @param data zoo object with the precipitation time series of all stations. The dates should have the format \%Y-\%m-\%d.
 #' @param metadata data.frame object containing the metadata of the precipitation stations. This data.frame must have five fields in the following specific order:
-#'   'ID': number of the stations, starting from 1 to the total number of stations; 'NAME': the code of each station; 'LAT': the latitude coordinates in WGS84;
-#'   'LONG': the longitude coordinates in WGS84; and 'ELEVATION': the elevation of the station in metres.
+#     ID: number of the stations, starting from 1 to the total number of stations; NAME: the code of each station; LAT: the latitude coordinates in WGS84;
+#'   LONG: the longitude coordinates in WGS84; and ELEVATION: the elevation of the station in metres.
 #' @param output character object with the path of the directory where the data will be stored.
 #'
-#' @return
+#' @return This function formats the ground-based precipitation stations data according to SWAT+ requirements.
 #' @export
 #'
 #' @examples
@@ -45,14 +45,14 @@ formatPstations <- function(data, metadata, output){
 
 #' Format ground-based temperature data according to `SWAT+` requirements
 #'
-#' @param dataTmax zoo object with the maximum temperature time series of all stations (one per column). The dates should have the format %Y-%m-%d.
-#' @param dataTmin zoo object with the minimum temperature time series of all stations (one per column). The dates should have the format %Y-%m-%d.
+#' @param dataTmax zoo object with the maximum temperature time series of all stations. The dates should have the format \%Y-\%m-\%d.
+#' @param dataTmin zoo object with the minimum temperature time series of all stations. The dates should have the format \%Y-\%m-\%d.
 #' @param metadata data.frame object containing the metadata of the precipitation stations. This data.frame must have five fields in the following specific order:
-#'   'ID': number of the stations, starting from 1 to the total number of stations; 'NAME': the code of each station; 'LAT': the latitude coordinates in WGS84;
-#'   'LONG': the longitude coordinates in WGS84; and 'ELEVATION': the elevation of the station in metres.
+#     ID: number of the stations, starting from 1 to the total number of stations; NAME: the code of each station; LAT: the latitude coordinates in WGS84;
+#'   LONG: the longitude coordinates in WGS84; and ELEVATION: the elevation of the station in metres.
 #' @param output character object with the path of the directory where the data will be stored.
 #'
-#' @return
+#' @return This function formats the ground-based precipitation stations data according to SWAT+ requirements.
 #' @export
 #'
 #' @examples
