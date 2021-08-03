@@ -15,7 +15,7 @@ prec2stations(product, dem, output, hru.shape, start)
 
 \item{hru.shape}{Spatial object of type 'SpatVector' that contains the HRUs as obtained from QSWAT+}
 
-\item{start}{Character object that contains the starting date of the model in the format '%Y%m%d' e.g., '19810101'.}
+\item{start}{Character object that contains the starting date of the model in the format '%Y%m%d' (e.g., '19810101').}
 }
 \value{
 

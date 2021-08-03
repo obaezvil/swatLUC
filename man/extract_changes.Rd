@@ -4,23 +4,23 @@
 \alias{extract_changes}
 \title{Generate a data.frame with the land cover of the HRUs for every land cover given as an input}
 \usage{
-extract_changes(hru.shape, lc, fun = modal, fact.diss, lookup.table)
+extract_changes(hru.shape, lc, lookup.table, fun = modal, fact.diss = NULL)
 }
 \arguments{
 \item{hru.shape}{Spatial object of type 'SpatVector' that contains the HRUs as obtained from QSWAT+.}
 
 \item{lc}{Raster object of type 'SpatRaster' that contains the land cover for the years to be analysed.}
 
-\item{fun}{Function to be used to calculate the land cover over each HRU. The 'modal' function from the terra package
-is reccomended.}
-
-\item{fact.diss}{Factor of dissagregation of the land cover maps. Sometimes, when the HRUs are very small,
-this function can return NAs. Therefore, the LU maps are dissagregated using the nearest neighbour. A value of 1 means
-no dissagregation. See terra::disagregate for more details.}
-
 \item{lookup.table}{A three column data.frame. The first column stores the land use values from the 'lc' object. The
 second column stores the SWAT_CODE as in the lookup table that is given to SWAT+. Finally, the third column represents
 the land use (lum) identifiers from SWAT+ that can be obtained from the 'landuse.lum' file.}
+
+\item{fun}{Function to be used to calculate the land cover over each HRU. The 'modal' function from the terra package
+is reccomended.}
+
+\item{fact.diss}{Factor of disaggregation of the land cover maps. Sometimes, when the HRUs are very small,
+this function can return NAs. Therefore, the LU maps are disaggregated using the nearest neighbour. A value of 1 means
+no disaggregation. See terra::disaggregate for more details.}
 }
 \value{
 This function returns a object type 'data.frame' for all HRUs with their respective land use values obtaied through the function 'fun'
