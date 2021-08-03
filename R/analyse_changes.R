@@ -3,20 +3,20 @@
 #' @author Oscar M. Baez-Villanueva
 #' @param hru.shape Spatial object of type 'SpatVector' that contains the HRUs as obtained from QSWAT+.
 #' @param lc Raster object of type 'SpatRaster' that contains the land cover for the years to be analysed.
-#' @param fun Function to be used to calculate the land cover over each HRU. The 'modal' function from the terra package
-#'    is reccomended.
-#' @param fact.diss Factor of dissagregation of the land cover maps. Sometimes, when the HRUs are very small,
-#'    this function can return NAs. Therefore, the LU maps are dissagregated using the nearest neighbour. A value of 1 means
-#'    no dissagregation. See terra::disagregate for more details.
 #' @param lookup.table A three column data.frame. The first column stores the land use values from the 'lc' object. The
 #'    second column stores the SWAT_CODE as in the lookup table that is given to SWAT+. Finally, the third column represents
 #'    the land use (lum) identifiers from SWAT+ that can be obtained from the 'landuse.lum' file.
+#' @param fun Function to be used to calculate the land cover over each HRU. The 'modal' function from the terra package
+#'    is reccomended.
+#' @param fact.diss Factor of disaggregation of the land cover maps. Sometimes, when the HRUs are very small,
+#'    this function can return NAs. Therefore, the LU maps are disaggregated using the nearest neighbour. A value of 1 means
+#'    no disaggregation. See terra::disaggregate for more details.
 #'
 #' @return This function returns a object type 'data.frame' for all HRUs with their respective land use values obtaied through the function 'fun'
 #' @export
 #'
 #' @examples
-extract_changes <- function(hru.shape, lc, fun = modal, fact.diss, lookup.table) {                  ###### DAR LOOKUPTABLE AGREGAR AREA DE HRU KM2!!!!!!! No Ha
+extract_changes <- function(hru.shape, lc, lookup.table, fun = modal, fact.diss = NULL) {   # change the HRU area to KM2
 
   # Cropping the land cover stack to the catchment extent
   shape.proj <- terra::project(hru.shape, terra::crs(lc))
@@ -28,7 +28,9 @@ extract_changes <- function(hru.shape, lc, fun = modal, fact.diss, lookup.table)
   lc <- terra::project(lc, terra::crs(hru.shape), method = "near")
 
   # Dissagregating the land cover to avoid NAs in small HRUs
-  lc <- terra::disaggregate(lc, fact.diss, method = "near")
+  if(!is.null(fact.diss))
+    lc <- terra::disaggregate(lc, fact.diss, method = "near")
+  
   # Masking the lc object
   lc <- terra::mask(lc, hru.shape)
 
