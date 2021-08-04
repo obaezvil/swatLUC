@@ -13,33 +13,42 @@ LUCscen(
   change.yr,
   skip.copy = FALSE,
   jday = 1,
-  fact.diss = 8,
+  fact.diss = NULL,
   scen.path = NULL,
   verbose = TRUE,
   exclude.uses = NULL
 )
 }
 \arguments{
-\item{scen.name}{Character object containing the name of the new scenario to be created.}
+\item{scen.name}{Object type 'character' with the name of the new scenario to be created.}
 
-\item{textInOut.path}{Path to the default 'TxtInOut'. The new scenario will be created from this file.}
+\item{textInOut.path}{Path to the default 'TxtInOut' folder. The new scenario will be created from this file.}
 
-\item{hru.shape}{Spatial object of type 'SpatVector' that contains the HRUs as obtained from QSWAT+.}
+\item{hru.shape}{Spatial object of type 'SpatVector' that contains the HRUs that were created in the `QSWAT+` project.}
 
 \item{lc}{Raster object of type 'SpatRaster' that contains the land cover for the years to be analysed.}
 
-\item{lookup.table}{A three column data.frame. The first column stores the land use values from the 'lc' object. The
-second column stores the SWAT_CODE as in the lookup table that is given to SWAT+. Finally, the third column represents
-the land use (lum) identifiers from SWAT+ that can be obtained from the 'landuse.lum' file.}
+\item{lookup.table}{A three column 'data.frame' object. The first column stores the land use values from the 'lc' 
+object. The second column stores the SWAT_CODE as in the lookup table that is given to `SWAT+`. Finally, the 
+third column represents the land use (lum) identifiers from `SWAT+` as stored in the 'landuse.lum' file.}
 
-\item{change.yr}{Character object containing the yera(s) when the land use changes take place (in chronological order).}
+\item{change.yr}{Object type 'character' containing the year(s) when the land use changes take place (in chronological order).}
 
-\item{jday}{Numerical value that indicates the julian day that the land use changes will take place (default jday = 1).}
+\item{skip.copy}{Logical object. Set tu true only if the files from the default 'TxtInOut' folder have been 
+already copied to the directory of the new scenario.}
+
+\item{jday}{Numerical value that indicates the julian day that the land use change(s) will take place (default jday = 1).}
+
+\item{fact.diss}{Factor of disaggregation of the land cover maps. Sometimes, when the HRUs are very small,
+this function can return NAs. Therefore, the LU maps are disaggregated using the nearest neighbour. A value of 1 means
+no disaggregation. See terra::disaggregate for more details.}
 
 \item{scen.path}{Path to the directory where the new scenatio will be created. If not given, the new scenario will be
-created in the folder of the default scenario.}
+created in the same folder of the default scenario.}
 
-\item{verbose}{Should the progress messages be printed?}
+\item{verbose}{Object type 'logical'. Should the progress messages be printed?}
+
+\item{exclude.uses}{Exclude land use classes from the scenario. Currently, the change of urban and water classes cause errors in `SWAT+`; and therefore, should be avoided.}
 }
 \value{
 

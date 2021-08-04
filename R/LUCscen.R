@@ -3,18 +3,24 @@
 
 #' Generate a new land use change scenario in SWAT+
 #'
-#' @param scen.name Character object containing the name of the new scenario to be created.
-#' @param textInOut.path Path to the default 'TxtInOut'. The new scenario will be created from this file.
-#' @param hru.shape Spatial object of type 'SpatVector' that contains the HRUs as obtained from QSWAT+.
+#' @param scen.name Object type 'character' with the name of the new scenario to be created.
+#' @param textInOut.path Path to the default 'TxtInOut' folder. The new scenario will be created from this file.
+#' @param hru.shape Spatial object of type 'SpatVector' that contains the HRUs that were created in the `QSWAT+` project.
 #' @param lc Raster object of type 'SpatRaster' that contains the land cover for the years to be analysed.
-#' @param lookup.table A three column data.frame. The first column stores the land use values from the 'lc' object. The
-#'    second column stores the SWAT_CODE as in the lookup table that is given to SWAT+. Finally, the third column represents
-#'    the land use (lum) identifiers from SWAT+ that can be obtained from the 'landuse.lum' file.
-#' @param change.yr Character object containing the yera(s) when the land use changes take place (in chronological order).
-#' @param jday Numerical value that indicates the julian day that the land use changes will take place (default jday = 1).
+#' @param lookup.table A three column 'data.frame' object. The first column stores the land use values from the 'lc' 
+#'    object. The second column stores the SWAT_CODE as in the lookup table that is given to `SWAT+`. Finally, the 
+#'    third column represents the land use (lum) identifiers from `SWAT+` as stored in the 'landuse.lum' file.
+#' @param skip.copy Logical object. Set tu true only if the files from the default 'TxtInOut' folder have been 
+#'    already copied to the directory of the new scenario.
+#' @param change.yr Object type 'character' containing the year(s) when the land use changes take place (in chronological order).
+#' @param jday Numerical value that indicates the julian day that the land use change(s) will take place (default jday = 1).
+#' @param fact.diss Factor of disaggregation of the land cover maps. Sometimes, when the HRUs are very small,
+#'    this function can return NAs. Therefore, the LU maps are disaggregated using the nearest neighbour. A value of 1 means
+#'    no disaggregation. See terra::disaggregate for more details.
 #' @param scen.path Path to the directory where the new scenatio will be created. If not given, the new scenario will be
-#'    created in the folder of the default scenario.
-#' @param verbose Should the progress messages be printed?
+#'    created in the same folder of the default scenario.
+#' @param verbose Object type 'logical'. Should the progress messages be printed?
+#' @param exclude.uses Exclude land use classes from the scenario. Currently, the change of urban and water classes cause errors in `SWAT+`; and therefore, should be avoided.
 #'
 #' @return
 #' @export
@@ -28,7 +34,7 @@ LUCscen <- function(scen.name,
                     change.yr,
                     skip.copy = FALSE,
                     jday = 1,
-                    fact.diss = 8,
+                    fact.diss = NULL,
                     scen.path = NULL,
                     verbose = TRUE,
                     exclude.uses = NULL){
@@ -57,11 +63,12 @@ LUCscen <- function(scen.name,
     dir.create(new.folder)
 
     # Copying the defauld scenario inside new scenario
-  if(skip.copy){
+  if(!skip.copy){
 
     if(verbose){
       message("#------ Creating new scenario files in: ------------# \n")
       message(new.folder, "\n")
+      file.copy(textInOut.path, new.folder, recursive = TRUE)
     }
 
   } else {
@@ -69,7 +76,6 @@ LUCscen <- function(scen.name,
       if(verbose)
         message("#------ The file was not copied! ------------# \n")
 
-    file.copy(textInOut.path, new.folder, recursive = TRUE)
   }
 
   if(verbose)
