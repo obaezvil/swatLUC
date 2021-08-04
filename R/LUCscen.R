@@ -81,7 +81,6 @@ LUCscen <- function(scen.name,
   if(verbose)
     message("#------ Starting the analysis of LU changes --------# \n")
 
-
   # Setting the path to the new path
   textInOut.new <- file.path(new.folder, basename(textInOut.path))
 
@@ -132,16 +131,13 @@ LUCscen <- function(scen.name,
   # Apply function to analyse the changes according to HRU and land covers
   changes.df <- extract_changes(hru.shape, lc, fun = terra::modal, fact.diss = fact.diss, lookup.table = lookup.table)
 
-  # Storing id's of the HRUs
-  ids <- changes.df$LU_values[,1]
-
-    # Generating list to store the analysis per change
+  # Generating list to store the analysis per change
   activities.list <- list()
 
   # Setting vectod for outcomes
   outc.general <- rep("n", n.alts)
 
-  # Creating new folder to store the new
+  # Creating new folder to store the shapefiles
   shape.folder <- file.path(new.folder, "Shapefiles_HRU_Changes")
 
   if(!file.exists(shape.folder))
@@ -156,12 +152,16 @@ LUCscen <- function(scen.name,
 
   # Get changes
   for(i in 1:n.alts){
+    
+    # Storing id's of the HRUs
+    ids <- changes.df$LU_values[,1]
+    
     # Substracting the columns of the change 'i'
     subset.df        <- data.frame(changes.lum[,i], changes.lum[,i+1])
     names(subset.df) <- c("Before", "After")
 
-    before <- subset.df[,i]
-    after  <- subset.df[,i+1]
+    before <- subset.df[,1]
+    after  <- subset.df[,2]
 
     # Subsetting HRUs according to NAs
     exclude <- which(is.na(before))
@@ -172,8 +172,11 @@ LUCscen <- function(scen.name,
       before <- before[-exclude]
       after  <- after[-exclude]
       ids    <- ids[-exclude]
+      
+      if(verbose)
+        Warning("There are NA values in the analysis, try increasing the 'fact.diss' parameter! \n")
     }
-
+  
     # Subsetting HRUs according to exclude cases
     exclude <- which(before %in% exclude.uses)
     exclude <- c(exclude, which(after %in% exclude.uses))
@@ -198,8 +201,10 @@ LUCscen <- function(scen.name,
     # Warning of new clases!!
     new.elements <- after[which(!(after %in% before))]
     new.elements <- unique(new.elements)
-    warning("The land covers: '", new.elements, "' are not contained in the initial conditions! \n",
-            "Please make sure that they are defined in the 'landuse.lum', 'cntable.lum', 'plant.ini', and 'ovn_table.lum'files!")
+    if(length(new.elements) > 0)
+      warning("Warning! The land cover(s): '", new.elements, "' is(are) not contained in the initial conditions! \n",
+            "Please make sure that it(they) is(are) defined in the 'landuse.lum', 'cntable.lum', 'plant.ini', and 'ovn_table.lum' files! \n",
+            "In the case that the new land cover(s) is(are) included in 'landuse.lum' please omit this warning :)")
 
     # Subsetting HRUs that changed
     pos <- which(before != after)
@@ -215,7 +220,7 @@ LUCscen <- function(scen.name,
 
     outcome    <- outc.general
     outcome[i] <- "y"
-    outcome    <- noquote(paste0(outcome, sep = "   "))
+    outcome    <- noquote(paste(outcome, collapse = "   "))
     outcome    <- rep(outcome, length(pos))
 
     # Creating the activities section
@@ -316,17 +321,17 @@ LUCscen <- function(scen.name,
   lim_op    <- stringi::stri_pad(cond$lim_op, width = 5, side = "right")
   lim_const <- stringi::stri_pad(cond$lim_const, width = 19, side = "right")
 
-  alt        <- data.frame(apply(alternatives, 1, stringi::stri_pad,
+  alt        <- data.frame(apply(alternatives, 2, stringi::stri_pad,
                                  width = 11, side = "right"))
   names(alt) <- names(alternatives)
 
-  condalt <- data.frame(
+  condalt <- cbind(data.frame(
     var = var,
     obj = obj,
     obj_num = obj_num,
     lim_var = lim_var,
     lim_op = lim_op,
-    lim_const = lim_const,
+    lim_const = lim_const),
     alt
   )
 
