@@ -80,36 +80,76 @@ extract_changes <- function(hru.shape, lc, lookup.table, fun = modal, fact.diss 
 #' Plot the changes of the given land use layers as pie charts
 #'
 #' @author Oscar M. Baez-Villanueva
-#' @param df.changes Object of type 'data.frame' obtained from
-#'    applying the function 'extract_changes'.
-#' @param ncolumns Number of columns of the resulting figure.
-#' @param df.codes Data frame of two columns. The first column 'ID'
-#'    must contain the codes of the land uses, while the second column
-#'    'names' contain the respective land cover names.
 #'
-#' @return This function returns a 3D pie plot for every land cover layer
-#'    given to the 'extract_changes' function.
+#' @param lc Raster object of type 'SpatRaster' that contains the land cover for the years to be analysed.
+#' @param hru.shape Spatial object of type 'SpatVector' that contains the HRUs as obtained from QSWAT+.
+#' @param lookup.table A three column data.frame. The first column stores the land use values from the 'lc' object. The
+#'    second column stores the SWAT_CODE as in the lookup table that is given to SWAT+. Finally, the third column represents
+#'    the land use (lum) identifiers from SWAT+ that can be obtained from the 'landuse.lum' file.
+#' @param ncolumns Number of columns of the resulting figure.
+#' @param lc.years Numeric vector of the years of the land use layers. If not provided, the name of the laywers will be used.
+#' @param output Path where the 'png' file will be stored. If not provided, the image will be displayed in the plot view.
+#' @param lc.resolution Resolution of the product in sqared kilometres. If not provided, the figures will show the number of grid-cells.
+#' @param width Width of the resulting 'png' figure (set to 1200 pixels).
+#' @param height Height of the resulting 'png' figure (set to 1200 pixels).
+#' @param res Resolution of the resulting 'png' figure (set to 100 pixels).
+#'
+#' @return This function returns bar charts of the land use change of the study area acording to the land use cover layers provided.
 #' @export
 #'
 #' @examples
-plot_changes <- function(df.changes, ncolumns, df.codes){
-
-  n     <- ncol(df.changes) - 1
-  nrows <- ceiling(n/ncolumns)
-
-  par(mfrow = c(nrows, ncolumns))
-
-  for(i in 1:n){
-
-    slices <- df.changes[,i+1]
-    slices <- data.frame(ftable(slices))
-    labels <- df.codes[which(df.codes[,1] %in% slices$slices),2]
-    slices <- slices$Freq
-    main   <- colnames(df.changes)[i+1]
-
-    plotrix::pie3D(slices, labels = labels, explode = 0.1, main = main, labelcex = 0.55, height = 0.1)
+#' 
+plot_changes <- function(lc, hru.shape, lookup.table, ncolumns, 
+                         lc.years = NULL, output = NULL, lc.resolution = NULL,
+                         width = 1200, height = 900, res = 100){
+  
+  lc   <- terra::mask(lc, hru.shape)
+  vals <- terra::values(lc)
+  freq <- apply(vals, 2, ftable)
+  
+  classes    <- ncol(freq)
+  classnames <- lookup.table$SWAT_CODE
+  
+  if(length(lc.years) != classes)
+    stop("The number of 'lc.years' does not correspond with the number of layers provided!")
+  
+  if(!is.null(lc.years))
+    colnames(freq) <- as.character(lc.years)
+  
+  ylab <- "No. Grid-dells"
+  
+  if(!is.null(lc.resolution)){
+    fact <- lc.resolution * lc.resolution
+    freq <- freq * fact
+    ylab <- "Area (km2)"
+    
   }
 
+ cols <- RColorBrewer::brewer.pal(max(classes, 3), "PRGn")
+ 
+ if(!is.null(output)){
+   
+   if(!file.exists(output))
+     stop("the 'output' path does not exist!")
+   
+   png(file.path(output, "land_use_changes_plot.png"), width = width, height = height, units = "px", res = res)
+ }
+   
+ 
+ layout(matrix(c(1:nrow(freq)), ncol = ncolumns, byrow = TRUE))
+ 
+ for(i in 1:nrow(freq)){
+   
+   main <- paste0(lookup.table$SWAT_CODE[i], " (", lookup.table$SWAT_NAME[i], ")")
+   
+   barplot(freq[i,], col = cols, main = main,
+           ylab = ylab)
+   
+ }
+ 
+ if(!is.null(output))
+    dev.off()
+ 
 }
 
 
